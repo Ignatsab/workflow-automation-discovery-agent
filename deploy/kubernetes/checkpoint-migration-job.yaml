@@ -1,0 +1,19 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: workflow-intake-checkpoint-migration
+spec:
+  backoffLimit: 3
+  template:
+    spec:
+      restartPolicy: OnFailure
+      containers:
+        - name: migrate
+          image: registry.example.bank/workflow-intake-agent:0.2.0
+          command: ["automation-intake-migrate"]
+          env:
+            - name: CHECKPOINT_DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: workflow-intake-agent
+                  key: checkpoint-database-url

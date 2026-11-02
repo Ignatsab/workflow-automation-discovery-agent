@@ -1,6 +1,6 @@
 # Workflow Automation Discovery Agent
 
-This repository is a bank-oriented starter kit for a guided intake agent in Langflow. It interviews an internal requester, records evidence in a controlled schema, calculates a deterministic automation-priority score, and produces a standardized Word product card plus current-state and proposed-state Mermaid diagrams.
+This repository is a bank-oriented implementation of a guided intake agent. An importable Langflow flow provides the chat surface, while a deployable LangGraph service runs the Qwen conversation, controlled evidence extraction, interview state, validation, and deterministic scoring. It can also produce a standardized Word product card plus current-state and proposed-state Mermaid diagrams.
 
 The language model is used for conversation, extraction, and drafting. It does not calculate the score, approve access, invent missing facts, or execute changes in bank systems.
 
@@ -12,8 +12,11 @@ The language model is used for conversation, extraction, and drafting. It does n
 - `src/use_case_agent/engine.py` validates evidence, merges proposed updates, chooses follow-up questions, and evaluates completion.
 - `src/use_case_agent/scoring.py` calculates a reproducible score and confidence penalty.
 - `src/use_case_agent/artifacts.py` creates the Word product card and Mermaid diagrams.
-- `langflow_components/intake_control_gate.py` is a Langflow custom component wrapper around the deterministic controls.
-- `langflow/ASSEMBLY.md` explains how to assemble the flow with an OpenAI-compatible Qwen endpoint.
+- `langflow/workflow_automation_discovery_langgraph.json` is the importable Langflow flow. It requires no external custom-component package.
+- `src/use_case_agent/langgraph_agent.py` is the stateful LangGraph implementation.
+- `src/use_case_agent/api.py` exposes the LangGraph agent to Langflow and direct clients.
+- `deploy/kubernetes/` contains a hardened starter Deployment, Service, migration Job, and secret-key example.
+- `langflow_components/intake_control_gate.py` remains available for teams that deliberately prefer an in-process custom Langflow component.
 - `examples/sample_case.json` is synthetic data for local testing.
 
 ## Recommended architecture
@@ -21,13 +24,14 @@ The language model is used for conversation, extraction, and drafting. It does n
 ```mermaid
 flowchart LR
     U[Internal requester] --> UI[Authenticated chat UI]
-    UI --> LF[Langflow intake flow]
-    LF --> Q[Qwen endpoint]
+    UI --> LF[Langflow portable proxy flow]
+    LF --> LG[LangGraph agent API]
+    LG --> Q[Bank Qwen endpoint]
     Q --> E[Structured extraction]
-    E --> G[Validation and evidence gate]
+    E --> G[Deterministic validation and evidence gate]
     G --> C[(Canonical case store)]
     C --> P[Question planner]
-    P --> LF
+    P --> LG
     C --> S[Deterministic scoring]
     C --> A[Product card and diagrams]
     LF -. approved read only tools .-> MCP[MCP and API connectors]
@@ -47,6 +51,27 @@ python -m unittest discover -s tests -v
 ```
 
 For local development without installing the package, set `PYTHONPATH=src`.
+
+## Run the LangGraph service
+
+Install the agent extras, configure the bank-hosted OpenAI-compatible Qwen endpoint, and run the API:
+
+```bash
+python -m pip install -e '.[agent,test]'
+export QWEN_BASE_URL='https://qwen.example.bank/v1'
+export QWEN_MODEL='approved-qwen-model'
+export QWEN_API_KEY='secret-reference-value'
+export AGENT_API_KEY='separate-langflow-to-agent-secret'
+export CHECKPOINT_DATABASE_URL='postgresql://user:password@host:5432/intake?sslmode=require'
+automation-intake-migrate
+automation-intake-api
+```
+
+Without `CHECKPOINT_DATABASE_URL`, the service uses volatile in-memory checkpoints for local development only. See `deploy/kubernetes/README.md` for Kubernetes deployment.
+
+## Import into Langflow
+
+Import `langflow/workflow_automation_discovery_langgraph.json`, open its API Request node, set the internal service URL and `x-api-key`, then run the Playground. The detailed compatibility and troubleshooting steps are in `langflow/ASSEMBLY.md`.
 
 ## Production boundaries
 

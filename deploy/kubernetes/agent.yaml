@@ -1,0 +1,83 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: workflow-intake-agent
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: workflow-intake-agent
+  template:
+    metadata:
+      labels:
+        app: workflow-intake-agent
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: agent
+          image: registry.example.bank/workflow-intake-agent:0.2.0
+          ports:
+            - name: http
+              containerPort: 8080
+          env:
+            - name: QWEN_BASE_URL
+              value: http://qwen-api.ai-platform.svc.cluster.local:8000/v1
+            - name: QWEN_MODEL
+              value: bank-qwen
+            - name: LANGGRAPH_STRICT_MSGPACK
+              value: "true"
+            - name: CHECKPOINT_DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: workflow-intake-agent
+                  key: checkpoint-database-url
+            - name: QWEN_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: workflow-intake-agent
+                  key: qwen-api-key
+            - name: AGENT_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: workflow-intake-agent
+                  key: agent-api-key
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 3
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 20
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: "1"
+              memory: 1Gi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
+            readOnlyRootFilesystem: true
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: workflow-intake-agent
+spec:
+  type: ClusterIP
+  selector:
+    app: workflow-intake-agent
+  ports:
+    - name: http
+      port: 8080
+      targetPort: http
