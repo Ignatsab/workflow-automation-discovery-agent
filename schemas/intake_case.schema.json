@@ -1,0 +1,45 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://internal.example/schemas/automation-intake-case-v1.json",
+  "title": "Workflow Automation Intake Case",
+  "type": "object",
+  "required": ["case_id", "schema_version", "summary", "ownership", "current_state", "value", "systems", "data", "controls", "target_state", "success_metrics", "delivery"],
+  "properties": {
+    "case_id": {"type": "string"},
+    "schema_version": {"const": "1.0"},
+    "summary": {"$ref": "#/$defs/section"},
+    "ownership": {"$ref": "#/$defs/section"},
+    "current_state": {"$ref": "#/$defs/section"},
+    "value": {"$ref": "#/$defs/section"},
+    "systems": {"$ref": "#/$defs/section"},
+    "data": {"$ref": "#/$defs/section"},
+    "controls": {"$ref": "#/$defs/section"},
+    "feasibility": {"$ref": "#/$defs/section"},
+    "target_state": {"$ref": "#/$defs/section"},
+    "ui": {"$ref": "#/$defs/section"},
+    "success_metrics": {"$ref": "#/$defs/section"},
+    "delivery": {"$ref": "#/$defs/section"},
+    "score": {"type": "object"},
+    "audit": {"type": "object"},
+    "approvals": {"type": "object"}
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "evidence": {"type": "string", "enum": ["confirmed", "system_verified", "estimate", "assumption", "unknown"]},
+    "fact": {
+      "type": "object",
+      "required": ["value", "evidence", "source_ref", "notes"],
+      "properties": {
+        "value": {},
+        "evidence": {"$ref": "#/$defs/evidence"},
+        "source_ref": {"type": "string"},
+        "notes": {"type": "string"}
+      },
+      "additionalProperties": false
+    },
+    "section": {
+      "type": "object",
+      "additionalProperties": {"$ref": "#/$defs/fact"}
+    }
+  }
+}

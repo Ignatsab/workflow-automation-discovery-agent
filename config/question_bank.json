@@ -1,0 +1,90 @@
+{
+  "version": "1.0",
+  "interview_rules": {
+    "max_questions_per_turn": 3,
+    "confirm_each_stage": true,
+    "allow_skip_with_reason": true,
+    "finish_requires_owner_confirmation": true
+  },
+  "stages": [
+    {
+      "id": "purpose_and_ownership",
+      "title": "Purpose and ownership",
+      "required_paths": ["summary.problem_statement", "summary.goal", "ownership.process_owner", "ownership.requesting_unit"],
+      "questions": [
+        {"path": "summary.problem_statement", "question": "What happens today that you want to change, and what is the concrete problem?", "why": "Defines the current problem without assuming a solution."},
+        {"path": "summary.goal", "question": "What outcome should improve, and how would you recognize success?", "why": "Anchors the use case to an observable outcome."},
+        {"path": "ownership.process_owner", "question": "Who owns the process and can confirm how it works today?", "why": "A named owner is required to validate the process and accept change."},
+        {"path": "ownership.requesting_unit", "question": "Which team or business unit is requesting this?", "why": "Sets scope and routing."}
+      ]
+    },
+    {
+      "id": "current_process",
+      "title": "Current process",
+      "required_paths": ["current_state.trigger", "current_state.steps", "current_state.outcome", "current_state.exceptions"],
+      "questions": [
+        {"path": "current_state.trigger", "question": "What event starts the process, and who or what starts it?", "why": "Defines the process boundary."},
+        {"path": "current_state.steps", "question": "Please walk me through the normal path step by step, including handoffs and decisions.", "why": "Creates a verifiable current-state map."},
+        {"path": "current_state.outcome", "question": "What marks the process as complete, and where is that result recorded?", "why": "Defines the end boundary and evidence of completion."},
+        {"path": "current_state.exceptions", "question": "What are the most common exceptions, rework loops, and escalation paths?", "why": "Avoids designing only for the happy path."}
+      ]
+    },
+    {
+      "id": "demand_and_value",
+      "title": "Demand and value",
+      "required_paths": ["value.annual_manual_hours", "value.measurement_plan", "value.pain_severity_1_to_5", "value.error_rework_severity_1_to_5"],
+      "questions": [
+        {"path": "value.annual_manual_hours", "question": "How many cases occur, how long does one case take, and how many people participate? An estimate is acceptable if labeled as one.", "why": "Provides a comparable capacity baseline."},
+        {"path": "value.measurement_plan", "question": "If the baseline is unknown, which ServiceNow groups, ticket types, timestamps, queues, reports, or other records could measure it?", "why": "Turns an unknown benefit into a measurement task."},
+        {"path": "value.pain_severity_1_to_5", "question": "On a scale from 1 to 5, how disruptive is the current process, and what evidence supports that rating?", "why": "Records operational pain without letting the model infer it."},
+        {"path": "value.error_rework_severity_1_to_5", "question": "On a scale from 1 to 5, how serious are errors or rework, and what examples or data support that rating?", "why": "Captures quality and operational-risk value."}
+      ]
+    },
+    {
+      "id": "systems_and_data",
+      "title": "Systems and data",
+      "required_paths": ["systems.primary_systems", "systems.available_interfaces", "data.highest_classification", "data.records_in_scope"],
+      "questions": [
+        {"path": "systems.primary_systems", "question": "Which applications, databases, files, inboxes, or portals are used at each step?", "why": "Defines the technical boundary."},
+        {"path": "systems.available_interfaces", "question": "For each system, what approved integration exists: API, database view, event, file exchange, MCP server, or none known?", "why": "Separates accessible systems from screen-only assumptions."},
+        {"path": "data.highest_classification", "question": "What is the highest data classification involved, including personal, confidential, payment, authentication, or regulated data?", "why": "Determines handling and review requirements."},
+        {"path": "data.records_in_scope", "question": "Which specific records and fields must be read or written?", "why": "Supports least-privilege access design."}
+      ]
+    },
+    {
+      "id": "decisions_and_controls",
+      "title": "Decisions and controls",
+      "required_paths": ["controls.human_oversight_1_to_5", "controls.prohibited_actions", "controls.approval_points", "controls.audit_requirements"],
+      "questions": [
+        {"path": "controls.human_oversight_1_to_5", "question": "Which decisions must remain with a person, and what level of review is required before an action?", "why": "Defines the allowed autonomy boundary."},
+        {"path": "controls.prohibited_actions", "question": "What must the solution never do autonomously?", "why": "Creates explicit safety constraints."},
+        {"path": "controls.approval_points", "question": "Which approvals, segregation-of-duties checks, or four-eyes controls apply?", "why": "Preserves mandatory controls in the future state."},
+        {"path": "controls.audit_requirements", "question": "What inputs, outputs, decisions, prompts, tool calls, and approvals must be logged and retained?", "why": "Defines traceability."}
+      ]
+    },
+    {
+      "id": "target_experience",
+      "title": "Target experience",
+      "required_paths": ["target_state.user_journey", "target_state.automation_boundary", "target_state.fallback_path", "ui.channels"],
+      "questions": [
+        {"path": "target_state.user_journey", "question": "Describe the ideal user journey from request to completion.", "why": "Keeps the design grounded in user work."},
+        {"path": "target_state.automation_boundary", "question": "Which steps should be automated, assisted, or left unchanged?", "why": "Prevents an all-or-nothing automation assumption."},
+        {"path": "target_state.fallback_path", "question": "What should happen when data is missing, a system is unavailable, or model confidence is low?", "why": "Defines safe failure behavior."},
+        {"path": "ui.channels", "question": "Where should users interact with it: existing portal, Teams, ServiceNow, web app, email, or another channel?", "why": "Clarifies the user interface and authentication context."}
+      ]
+    },
+    {
+      "id": "delivery_and_success",
+      "title": "Delivery and success",
+      "required_paths": ["success_metrics.primary_metric", "success_metrics.baseline", "success_metrics.target", "delivery.dependencies", "delivery.pilot_scope"],
+      "questions": [
+        {"path": "success_metrics.primary_metric", "question": "What primary metric should determine whether the automation works?", "why": "Creates an acceptance criterion."},
+        {"path": "success_metrics.baseline", "question": "What is the current baseline and its source?", "why": "Allows before-and-after comparison."},
+        {"path": "success_metrics.target", "question": "What target and measurement period would justify rollout?", "why": "Defines the pilot decision."},
+        {"path": "delivery.dependencies", "question": "Which access requests, teams, vendors, policies, or platform changes are dependencies?", "why": "Makes delivery constraints visible."},
+        {"path": "delivery.pilot_scope", "question": "What is the smallest representative pilot population and process slice?", "why": "Limits early risk while preserving useful evidence."}
+      ]
+    }
+  ]
+}
+

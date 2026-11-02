@@ -1,0 +1,67 @@
+{
+  "case_id": "DEMO-2026-001",
+  "schema_version": "1.0",
+  "summary": {
+    "problem_statement": {"value": "Operations analysts manually triage internal access-related tickets and copy data between ServiceNow and an entitlement portal.", "evidence": "confirmed", "source_ref": "demo-message-02", "notes": "Synthetic example only."},
+    "goal": {"value": "Reduce triage time while retaining human approval for entitlement changes.", "evidence": "confirmed", "source_ref": "demo-message-04", "notes": "Synthetic example only."}
+  },
+  "ownership": {
+    "process_owner": {"value": "Access Operations Manager", "evidence": "confirmed", "source_ref": "demo-message-05", "notes": "Role, not a named person."},
+    "requesting_unit": {"value": "Corporate Access Operations", "evidence": "confirmed", "source_ref": "demo-message-01", "notes": "Synthetic unit."}
+  },
+  "current_state": {
+    "trigger": {"value": "A ticket enters the ACCESS TRIAGE assignment group.", "evidence": "system_verified", "source_ref": "demo-servicenow-query-01", "notes": "Synthetic tool result."},
+    "steps": {"value": ["Analyst opens the ticket", "Analyst checks required fields", "Analyst looks up the requester in the entitlement portal", "Analyst categorizes the request", "Approver decides whether to proceed", "Analyst records the decision and routes the ticket"], "evidence": "confirmed", "source_ref": "demo-message-09", "notes": "Owner-confirmed normal path."},
+    "outcome": {"value": "The ticket is routed to fulfilment or returned for missing information with the decision recorded.", "evidence": "confirmed", "source_ref": "demo-message-11", "notes": ""},
+    "exceptions": {"value": ["Missing manager", "Ambiguous entitlement name", "Privileged access request", "Requester identity mismatch"], "evidence": "confirmed", "source_ref": "demo-message-13", "notes": ""}
+  },
+  "value": {
+    "annual_manual_hours": {"value": 3200, "evidence": "estimate", "source_ref": "", "notes": "Estimated from 8,000 tickets at 24 minutes each; validate with ServiceNow timestamps and sampling."},
+    "measurement_plan": {"value": "Query twelve months of ticket counts, assignment history, reassignment counts, and resolution timestamps for the approved assignment group; validate handling time through a two-week sample.", "evidence": "confirmed", "source_ref": "demo-message-16", "notes": "No individual ticket text is required for the aggregate baseline."},
+    "pain_severity_1_to_5": {"value": 4, "evidence": "estimate", "source_ref": "", "notes": "Requester rating; confirm with analyst survey."},
+    "error_rework_severity_1_to_5": {"value": 3, "evidence": "estimate", "source_ref": "", "notes": "Reassignment rate not yet verified."},
+    "strategic_alignment_1_to_5": {"value": 4, "evidence": "confirmed", "source_ref": "demo-message-18", "notes": "Mapped to the unit plan in this synthetic example."},
+    "reuse_potential_1_to_5": {"value": 4, "evidence": "assumption", "source_ref": "", "notes": "Could apply to other structured triage queues; not yet assessed."}
+  },
+  "systems": {
+    "primary_systems": {"value": ["ServiceNow", "Entitlement portal", "Corporate directory"], "evidence": "confirmed", "source_ref": "demo-message-20", "notes": ""},
+    "available_interfaces": {"value": {"ServiceNow": "Approved REST API", "Entitlement portal": "Read API exists; scope unconfirmed", "Corporate directory": "Approved directory lookup service"}, "evidence": "confirmed", "source_ref": "demo-message-22", "notes": "Interface availability does not imply project access."}
+  },
+  "data": {
+    "highest_classification": {"value": "Internal confidential with employee identifiers; privileged-access cases require additional handling.", "evidence": "confirmed", "source_ref": "demo-message-24", "notes": "Formal privacy and security confirmation required."},
+    "records_in_scope": {"value": ["Ticket metadata and approved form fields", "Employee identifier and manager relationship", "Entitlement catalogue metadata"], "evidence": "confirmed", "source_ref": "demo-message-25", "notes": "No passwords or authentication factors."}
+  },
+  "controls": {
+    "human_oversight_1_to_5": {"value": 5, "evidence": "confirmed", "source_ref": "demo-message-27", "notes": "A person approves all entitlement changes."},
+    "decision_reversibility_1_to_5": {"value": 4, "evidence": "estimate", "source_ref": "", "notes": "Triage routing is reversible; fulfilment is outside the pilot."},
+    "prohibited_actions": {"value": ["Approve access", "Modify entitlements", "Close tickets", "Send requester communications without review"], "evidence": "confirmed", "source_ref": "demo-message-28", "notes": ""},
+    "approval_points": {"value": ["Analyst confirms extracted data", "Authorized approver decides the request", "Pilot owner approves rollout"], "evidence": "confirmed", "source_ref": "demo-message-29", "notes": ""},
+    "audit_requirements": {"value": "Record input references, extracted fields, rules applied, model and prompt versions, confidence, tool calls, human edits, approval, and final routing.", "evidence": "confirmed", "source_ref": "demo-message-30", "notes": "Retention period remains to be confirmed."}
+  },
+  "feasibility": {
+    "rule_based_share_pct": {"value": 70, "evidence": "estimate", "source_ref": "", "notes": "Estimate based on initial walkthrough."},
+    "digital_input_share_pct": {"value": 95, "evidence": "estimate", "source_ref": "", "notes": "Attachments may contain unstructured content."},
+    "access_readiness_1_to_5": {"value": 3, "evidence": "estimate", "source_ref": "", "notes": "APIs exist but service accounts and scopes are not approved."}
+  },
+  "target_state": {
+    "user_journey": {"value": "An analyst opens a triage work item containing validated ticket fields, directory matches, missing-information flags, and a proposed category. The analyst corrects or accepts the proposal and routes it to the existing approver.", "evidence": "confirmed", "source_ref": "demo-message-32", "notes": "Desired experience, not a deployed capability."},
+    "automation_boundary": {"value": ["Read approved ticket fields", "Check completeness with deterministic rules", "Retrieve approved directory and catalogue metadata", "Propose category and routing with confidence", "Present evidence to the analyst"], "evidence": "assumption", "source_ref": "", "notes": "Proposed future state requiring architecture and control review."},
+    "fallback_path": {"value": "If a lookup fails, required data is absent, or confidence is below the approved threshold, send the case to the current manual triage queue without taking an action.", "evidence": "confirmed", "source_ref": "demo-message-34", "notes": ""}
+  },
+  "ui": {
+    "channels": {"value": ["ServiceNow workspace"], "evidence": "confirmed", "source_ref": "demo-message-35", "notes": "A separate chat interface is not preferred for operational triage."}
+  },
+  "success_metrics": {
+    "primary_metric": {"value": "Median analyst handling time per triage ticket", "evidence": "confirmed", "source_ref": "demo-message-37", "notes": ""},
+    "baseline": {"value": "Not yet verified; initial estimate is 24 minutes per ticket.", "evidence": "estimate", "source_ref": "", "notes": "Use the approved measurement plan."},
+    "target": {"value": "At least 30 percent lower median handling time over an eight-week pilot, with no increase in incorrect routing or control exceptions.", "evidence": "confirmed", "source_ref": "demo-message-38", "notes": "Pilot target."}
+  },
+  "delivery": {
+    "dependencies": {"value": ["ServiceNow read scope", "Directory lookup approval", "Entitlement catalogue read scope", "Security and privacy review", "Process-owner availability", "Representative test cases"], "evidence": "confirmed", "source_ref": "demo-message-40", "notes": ""},
+    "pilot_scope": {"value": "One assignment group, two common non-privileged request categories, five analysts, and shadow mode before assisted routing.", "evidence": "confirmed", "source_ref": "demo-message-41", "notes": "Synthetic proposal."}
+  },
+  "score": {},
+  "audit": {"prompt_version": "1.0", "question_bank_version": "1.0"},
+  "approvals": {}
+}
+

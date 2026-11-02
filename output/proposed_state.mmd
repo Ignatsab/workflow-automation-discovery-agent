@@ -1,0 +1,18 @@
+flowchart TD
+    A["Request received"] --> V["Validate required inputs"]
+    V -->|Incomplete| H["Human follow up"]
+    V -->|Complete| C["Apply deterministic controls"]
+    T1["Read approved ticket fields"]
+    C --> T1
+    T2["Check completeness with deterministic rules"]
+    T1 --> T2
+    T3["Retrieve approved directory and catalogue metadata"]
+    T2 --> T3
+    T4["Propose category and routing with confidence"]
+    T3 --> T4
+    T5["Present evidence to the analyst"]
+    T4 --> T5
+    R["Human review and approval"]
+    T5 --> R
+    R --> O["Record outcome and audit evidence"]
+    R -->|Rejected or low confidence| F["Fallback to current process"]

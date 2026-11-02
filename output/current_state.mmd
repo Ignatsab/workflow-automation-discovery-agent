@@ -1,0 +1,16 @@
+flowchart TD
+    A["Trigger"]
+    S1["Analyst opens the ticket"]
+    A --> S1
+    S2["Analyst checks required fields"]
+    S1 --> S2
+    S3["Analyst looks up the requester in the entitlement portal"]
+    S2 --> S3
+    S4["Analyst categorizes the request"]
+    S3 --> S4
+    S5["Approver decides whether to proceed"]
+    S4 --> S5
+    S6["Analyst records the decision and routes the ticket"]
+    S5 --> S6
+    Z["Outcome"]
+    S6 --> Z
